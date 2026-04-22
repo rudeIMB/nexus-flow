@@ -220,7 +220,8 @@ const FeatureBundle = () => {
                   Thank you, we'll be in touch!
                 </h3>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                  Your feedback on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features has been recorded.
+                  Your feedback on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features
+                  and <span className="text-foreground font-medium">{selectedIntegrations.size + customIntegrations.length}</span> integrations has been recorded.
                   We'll reach out within 48 hours with your early-access invitation.
                 </p>
                 <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-soft text-xs font-mono text-accent-glow">

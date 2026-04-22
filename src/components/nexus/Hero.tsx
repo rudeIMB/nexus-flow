@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, QrCode, Coffee, Car, Users, Calendar, MapPin, Activity } from "lucide-react";
+import { ArrowRight, QrCode, Coffee, Car, Users, Calendar, MapPin, Activity, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Hero = () => {
@@ -99,7 +99,7 @@ const FloatingToken = ({
   className,
   delay,
 }: {
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  icon: LucideIcon;
   className?: string;
   delay: number;
 }) => (

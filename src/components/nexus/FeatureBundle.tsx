@@ -8,7 +8,7 @@ import {
   ConciergeBell, BellRing, FileText,
   TrendingUp, BarChart3, AlertTriangle,
   Database, Server, Webhook,
-  Check, Send, Sparkles, type LucideIcon,
+  Check, Send, Sparkles, Plug, Plus, X, type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,11 +86,40 @@ const leadSchema = z.object({
   useCase: z.string().trim().max(1000).optional().or(z.literal("")),
 });
 
+const integrationCatalog: { name: string; category: string }[] = [
+  { name: "Google Workspace", category: "Calendar" },
+  { name: "Microsoft 365", category: "Calendar" },
+  { name: "Outlook", category: "Calendar" },
+  { name: "Slack", category: "Comms" },
+  { name: "Microsoft Teams", category: "Comms" },
+  { name: "Zoom", category: "Video" },
+  { name: "Webex", category: "Video" },
+  { name: "Okta", category: "SSO" },
+  { name: "Azure AD", category: "SSO" },
+  { name: "Google SSO", category: "SSO" },
+  { name: "BambooHR", category: "HRIS" },
+  { name: "Workday", category: "HRIS" },
+  { name: "Personio", category: "HRIS" },
+  { name: "SAP", category: "ERP" },
+  { name: "Salesforce", category: "CRM" },
+  { name: "HubSpot", category: "CRM" },
+  { name: "Excel / CSV", category: "Migration" },
+  { name: "Google Sheets", category: "Migration" },
+  { name: "Notion", category: "Docs" },
+  { name: "Jira", category: "PM" },
+  { name: "ServiceNow", category: "ITSM" },
+  { name: "Zapier", category: "Automation" },
+  { name: "REST API / Webhooks", category: "Custom" },
+];
+
 const FeatureBundle = () => {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({ name: "", email: "", phone: "", useCase: "" });
+  const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(new Set());
+  const [customIntegrations, setCustomIntegrations] = useState<string[]>([]);
+  const [customInput, setCustomInput] = useState("");
 
   const totalCount = useMemo(() => categories.reduce((n, c) => n + c.features.length, 0), []);
 
@@ -100,6 +129,40 @@ const FeatureBundle = () => {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+  };
+
+  const toggleIntegration = (name: string) => {
+    setSelectedIntegrations((prev) => {
+      const next = new Set(prev);
+      next.has(name) ? next.delete(name) : next.add(name);
+      return next;
+    });
+  };
+
+  const addCustomIntegration = () => {
+    const v = customInput.trim();
+    if (!v) return;
+    if (v.length > 60) {
+      toast.error("Tool name too long (max 60 chars).");
+      return;
+    }
+    if (
+      customIntegrations.some((c) => c.toLowerCase() === v.toLowerCase()) ||
+      integrationCatalog.some((c) => c.name.toLowerCase() === v.toLowerCase())
+    ) {
+      toast.error("Already in your list.");
+      return;
+    }
+    if (customIntegrations.length >= 10) {
+      toast.error("Max 10 custom tools.");
+      return;
+    }
+    setCustomIntegrations([...customIntegrations, v]);
+    setCustomInput("");
+  };
+
+  const removeCustomIntegration = (name: string) => {
+    setCustomIntegrations(customIntegrations.filter((c) => c !== name));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -157,7 +220,8 @@ const FeatureBundle = () => {
                   Thank you, we'll be in touch!
                 </h3>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                  Your feedback on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features has been recorded.
+                  Your feedback on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features
+                  and <span className="text-foreground font-medium">{selectedIntegrations.size + customIntegrations.length}</span> integrations has been recorded.
                   We'll reach out within 48 hours with your early-access invitation.
                 </p>
                 <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-soft text-xs font-mono text-accent-glow">
@@ -222,6 +286,97 @@ const FeatureBundle = () => {
                   </div>
                 </motion.div>
               ))}
+
+              {/* Integrations selector */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="font-mono text-[10px] text-muted-foreground">07</span>
+                  <h3 className="font-display text-xl font-semibold">Tools you'd integrate</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4 ml-7">
+                  Pick the platforms Nexus should plug into — or add your own.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {integrationCatalog.map((it) => {
+                    const isOn = selectedIntegrations.has(it.name);
+                    return (
+                      <button
+                        type="button"
+                        key={it.name}
+                        onClick={() => toggleIntegration(it.name)}
+                        aria-pressed={isOn}
+                        className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-full border text-sm transition-all duration-200 ${
+                          isOn
+                            ? "bg-accent-soft border-accent text-foreground shadow-accent"
+                            : "glass hover:border-border-strong"
+                        }`}
+                      >
+                        <Plug
+                          className={`w-3.5 h-3.5 ${isOn ? "text-accent-glow" : "text-muted-foreground"}`}
+                          strokeWidth={1.75}
+                        />
+                        <span>{it.name}</span>
+                        <span className="font-mono text-[10px] uppercase tracking-wider opacity-60">
+                          {it.category}
+                        </span>
+                        {isOn && <Check className="w-3 h-3 text-accent-glow" strokeWidth={3} />}
+                      </button>
+                    );
+                  })}
+                  {customIntegrations.map((name) => (
+                    <span
+                      key={name}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-accent bg-accent-soft text-sm shadow-accent"
+                    >
+                      <Plug className="w-3.5 h-3.5 text-accent-glow" strokeWidth={1.75} />
+                      {name}
+                      <span className="font-mono text-[10px] uppercase tracking-wider opacity-60">
+                        Custom
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeCustomIntegration(name)}
+                        className="ml-1 -mr-1 w-4 h-4 rounded-full hover:bg-destructive/20 flex items-center justify-center"
+                        aria-label={`Remove ${name}`}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-5 flex flex-col sm:flex-row gap-2 max-w-xl">
+                  <Input
+                    value={customInput}
+                    onChange={(e) => setCustomInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCustomIntegration();
+                      }
+                    }}
+                    placeholder="Add a tool we missed (e.g. Freshservice, Monday…)"
+                    maxLength={60}
+                    className="bg-input border-border h-11"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addCustomIntegration}
+                    className="h-11 shrink-0"
+                  >
+                    <Plus className="w-4 h-4 mr-1" /> Add tool
+                  </Button>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground font-mono">
+                  {selectedIntegrations.size + customIntegrations.length} tools selected
+                </p>
+              </motion.div>
 
               {/* Lead form */}
               <motion.div

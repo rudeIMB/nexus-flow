@@ -3,6 +3,7 @@ import Hero from "@/components/nexus/Hero";
 import ValueProps from "@/components/nexus/ValueProps";
 import ReceptionistView from "@/components/nexus/ReceptionistView";
 import PrivacyToggle from "@/components/nexus/PrivacyToggle";
+import Integrations from "@/components/nexus/Integrations";
 import FeatureBundle from "@/components/nexus/FeatureBundle";
 import Footer from "@/components/nexus/Footer";
 
@@ -15,6 +16,7 @@ const Index = () => {
         <ValueProps />
         <ReceptionistView />
         <PrivacyToggle />
+        <Integrations />
         <FeatureBundle />
       </main>
       <Footer />

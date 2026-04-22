@@ -86,11 +86,40 @@ const leadSchema = z.object({
   useCase: z.string().trim().max(1000).optional().or(z.literal("")),
 });
 
+const integrationCatalog: { name: string; category: string }[] = [
+  { name: "Google Workspace", category: "Calendar" },
+  { name: "Microsoft 365", category: "Calendar" },
+  { name: "Outlook", category: "Calendar" },
+  { name: "Slack", category: "Comms" },
+  { name: "Microsoft Teams", category: "Comms" },
+  { name: "Zoom", category: "Video" },
+  { name: "Webex", category: "Video" },
+  { name: "Okta", category: "SSO" },
+  { name: "Azure AD", category: "SSO" },
+  { name: "Google SSO", category: "SSO" },
+  { name: "BambooHR", category: "HRIS" },
+  { name: "Workday", category: "HRIS" },
+  { name: "Personio", category: "HRIS" },
+  { name: "SAP", category: "ERP" },
+  { name: "Salesforce", category: "CRM" },
+  { name: "HubSpot", category: "CRM" },
+  { name: "Excel / CSV", category: "Migration" },
+  { name: "Google Sheets", category: "Migration" },
+  { name: "Notion", category: "Docs" },
+  { name: "Jira", category: "PM" },
+  { name: "ServiceNow", category: "ITSM" },
+  { name: "Zapier", category: "Automation" },
+  { name: "REST API / Webhooks", category: "Custom" },
+];
+
 const FeatureBundle = () => {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({ name: "", email: "", phone: "", useCase: "" });
+  const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(new Set());
+  const [customIntegrations, setCustomIntegrations] = useState<string[]>([]);
+  const [customInput, setCustomInput] = useState("");
 
   const totalCount = useMemo(() => categories.reduce((n, c) => n + c.features.length, 0), []);
 
@@ -100,6 +129,40 @@ const FeatureBundle = () => {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+  };
+
+  const toggleIntegration = (name: string) => {
+    setSelectedIntegrations((prev) => {
+      const next = new Set(prev);
+      next.has(name) ? next.delete(name) : next.add(name);
+      return next;
+    });
+  };
+
+  const addCustomIntegration = () => {
+    const v = customInput.trim();
+    if (!v) return;
+    if (v.length > 60) {
+      toast.error("Tool name too long (max 60 chars).");
+      return;
+    }
+    if (
+      customIntegrations.some((c) => c.toLowerCase() === v.toLowerCase()) ||
+      integrationCatalog.some((c) => c.name.toLowerCase() === v.toLowerCase())
+    ) {
+      toast.error("Already in your list.");
+      return;
+    }
+    if (customIntegrations.length >= 10) {
+      toast.error("Max 10 custom tools.");
+      return;
+    }
+    setCustomIntegrations([...customIntegrations, v]);
+    setCustomInput("");
+  };
+
+  const removeCustomIntegration = (name: string) => {
+    setCustomIntegrations(customIntegrations.filter((c) => c !== name));
   };
 
   const handleSubmit = (e: React.FormEvent) => {

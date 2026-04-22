@@ -286,6 +286,97 @@ const FeatureBundle = () => {
                 </motion.div>
               ))}
 
+              {/* Integrations selector */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="font-mono text-[10px] text-muted-foreground">07</span>
+                  <h3 className="font-display text-xl font-semibold">Tools you'd integrate</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4 ml-7">
+                  Pick the platforms Nexus should plug into — or add your own.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {integrationCatalog.map((it) => {
+                    const isOn = selectedIntegrations.has(it.name);
+                    return (
+                      <button
+                        type="button"
+                        key={it.name}
+                        onClick={() => toggleIntegration(it.name)}
+                        aria-pressed={isOn}
+                        className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-full border text-sm transition-all duration-200 ${
+                          isOn
+                            ? "bg-accent-soft border-accent text-foreground shadow-accent"
+                            : "glass hover:border-border-strong"
+                        }`}
+                      >
+                        <Plug
+                          className={`w-3.5 h-3.5 ${isOn ? "text-accent-glow" : "text-muted-foreground"}`}
+                          strokeWidth={1.75}
+                        />
+                        <span>{it.name}</span>
+                        <span className="font-mono text-[10px] uppercase tracking-wider opacity-60">
+                          {it.category}
+                        </span>
+                        {isOn && <Check className="w-3 h-3 text-accent-glow" strokeWidth={3} />}
+                      </button>
+                    );
+                  })}
+                  {customIntegrations.map((name) => (
+                    <span
+                      key={name}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-accent bg-accent-soft text-sm shadow-accent"
+                    >
+                      <Plug className="w-3.5 h-3.5 text-accent-glow" strokeWidth={1.75} />
+                      {name}
+                      <span className="font-mono text-[10px] uppercase tracking-wider opacity-60">
+                        Custom
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeCustomIntegration(name)}
+                        className="ml-1 -mr-1 w-4 h-4 rounded-full hover:bg-destructive/20 flex items-center justify-center"
+                        aria-label={`Remove ${name}`}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-5 flex flex-col sm:flex-row gap-2 max-w-xl">
+                  <Input
+                    value={customInput}
+                    onChange={(e) => setCustomInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCustomIntegration();
+                      }
+                    }}
+                    placeholder="Add a tool we missed (e.g. Freshservice, Monday…)"
+                    maxLength={60}
+                    className="bg-input border-border h-11"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addCustomIntegration}
+                    className="h-11 shrink-0"
+                  >
+                    <Plus className="w-4 h-4 mr-1" /> Add tool
+                  </Button>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground font-mono">
+                  {selectedIntegrations.size + customIntegrations.length} tools selected
+                </p>
+              </motion.div>
+
               {/* Lead form */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

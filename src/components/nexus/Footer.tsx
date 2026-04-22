@@ -1,4 +1,4 @@
-import { Hexagon, Cloud, Server, Github, Twitter, Linkedin } from "lucide-react";
+import { Hexagon, Cloud, Server, Github, Twitter, Linkedin, type LucideIcon } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -55,7 +55,7 @@ const FooterCol = ({ title, items }: { title: string; items: string[] }) => (
 
 const DeployBadge = ({
   icon: Icon, label, sub,
-}: { icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; label: string; sub: string }) => (
+}: { icon: LucideIcon; label: string; sub: string }) => (
   <div className="glass rounded-xl px-3.5 py-2.5 flex items-center gap-2.5">
     <Icon className="w-4 h-4 text-accent" strokeWidth={1.75} />
     <div>

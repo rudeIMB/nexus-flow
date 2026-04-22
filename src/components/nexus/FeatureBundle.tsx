@@ -8,7 +8,7 @@ import {
   ConciergeBell, BellRing, FileText,
   TrendingUp, BarChart3, AlertTriangle,
   Database, Server, Webhook,
-  Check, Send, Sparkles, type LucideIcon,
+  Check, Send, Sparkles, Plug, Plus, X, type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

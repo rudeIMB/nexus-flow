@@ -1,31 +1,30 @@
 import { Plug } from "lucide-react";
 
-// Map of integration display name -> Simple Icons slug + brand hex.
-// Simple Icons CDN: https://cdn.simpleicons.org/{slug}/{hex}
-const ICONS: Record<string, { slug: string; color: string }> = {
-  "Google Workspace": { slug: "googleworkspace", color: "4285F4" },
-  "Microsoft 365": { slug: "microsoft365", color: "D83B01" },
-  Outlook: { slug: "microsoftoutlook", color: "0078D4" },
-  Slack: { slug: "slack", color: "4A154B" },
-  "Microsoft Teams": { slug: "microsoftteams", color: "6264A7" },
-  Zoom: { slug: "zoom", color: "0B5CFF" },
-  Webex: { slug: "webex", color: "00BCEB" },
-  Okta: { slug: "okta", color: "007DC1" },
-  "Azure AD": { slug: "microsoftazure", color: "0078D4" },
-  "Google SSO": { slug: "google", color: "4285F4" },
-  BambooHR: { slug: "bamboohr", color: "73C41D" },
-  Workday: { slug: "workday", color: "F38B00" },
-  Personio: { slug: "personio", color: "0F1B2D" },
-  SAP: { slug: "sap", color: "0FAAFF" },
-  Salesforce: { slug: "salesforce", color: "00A1E0" },
-  HubSpot: { slug: "hubspot", color: "FF7A59" },
-  "Excel / CSV": { slug: "microsoftexcel", color: "217346" },
-  "Google Sheets": { slug: "googlesheets", color: "34A853" },
-  Notion: { slug: "notion", color: "FFFFFF" },
-  Jira: { slug: "jira", color: "0052CC" },
-  ServiceNow: { slug: "servicenow", color: "62D84E" },
-  Zapier: { slug: "zapier", color: "FF4F00" },
-  "REST API / Webhooks": { slug: "", color: "" }, // fallback
+// Map of integration display name -> brand domain.
+// Uses Google's favicon service which reliably returns a logo for any domain.
+const DOMAINS: Record<string, string> = {
+  "Google Workspace": "workspace.google.com",
+  "Microsoft 365": "microsoft.com",
+  Outlook: "outlook.com",
+  Slack: "slack.com",
+  "Microsoft Teams": "teams.microsoft.com",
+  Zoom: "zoom.us",
+  Webex: "webex.com",
+  Okta: "okta.com",
+  "Azure AD": "azure.microsoft.com",
+  "Google SSO": "google.com",
+  BambooHR: "bamboohr.com",
+  Workday: "workday.com",
+  Personio: "personio.com",
+  SAP: "sap.com",
+  Salesforce: "salesforce.com",
+  HubSpot: "hubspot.com",
+  "Excel / CSV": "microsoft.com",
+  "Google Sheets": "sheets.google.com",
+  Notion: "notion.so",
+  Jira: "atlassian.com",
+  ServiceNow: "servicenow.com",
+  Zapier: "zapier.com",
 };
 
 type Props = {
@@ -35,13 +34,13 @@ type Props = {
 };
 
 const IntegrationIcon = ({ name, size = 20, className = "" }: Props) => {
-  const icon = ICONS[name];
-  if (!icon || !icon.slug) {
+  const domain = DOMAINS[name];
+  if (!domain) {
     return <Plug className={className} style={{ width: size, height: size }} strokeWidth={1.75} />;
   }
   return (
     <img
-      src={`https://cdn.simpleicons.org/${icon.slug}/${icon.color}`}
+      src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
       alt={`${name} logo`}
       width={size}
       height={size}

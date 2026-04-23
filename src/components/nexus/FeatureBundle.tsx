@@ -185,8 +185,13 @@ const FeatureBundle = () => {
       return;
     }
     setErrors({});
-    setSubmitted(true);
-    toast.success("Request sent — we'll be in touch shortly.");
+    setSubmitting(true);
+    // Simulate request → show transition animation, then thank-you state.
+    setTimeout(() => {
+      setSubmitting(false);
+      setSubmitted(true);
+      toast.success("Request sent — we'll be in touch shortly.");
+    }, 1100);
   };
 
   return (

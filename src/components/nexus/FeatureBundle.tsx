@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import IntegrationIcon from "./IntegrationIcon";
 
 type Feature = { id: string; title: string; desc: string; icon: LucideIcon };
 type Category = { id: string; label: string; features: Feature[] };
@@ -112,12 +113,18 @@ const integrationCatalog: { name: string; category: string }[] = [
   { name: "REST API / Webhooks", category: "Custom" },
 ];
 
+// Pre-selected feature ids — gives users a visible cue that cards are interactive.
+const PRESELECTED = ["qr-checkin", "capacity-booking", "public-private", "legacy-import"];
+
 const FeatureBundle = () => {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selected, setSelected] = useState<Set<string>>(new Set(PRESELECTED));
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({ name: "", email: "", phone: "", useCase: "" });
-  const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(new Set());
+  const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(
+    new Set(["Google Workspace", "Slack", "Excel / CSV"]),
+  );
   const [customIntegrations, setCustomIntegrations] = useState<string[]>([]);
   const [customInput, setCustomInput] = useState("");
 
@@ -178,8 +185,13 @@ const FeatureBundle = () => {
       return;
     }
     setErrors({});
-    setSubmitted(true);
-    toast.success("Request sent — we'll be in touch shortly.");
+    setSubmitting(true);
+    // Simulate request → show transition animation, then thank-you state.
+    setTimeout(() => {
+      setSubmitting(false);
+      setSubmitted(true);
+      toast.success("Request sent — we'll be in touch shortly.");
+    }, 1100);
   };
 
   return (
@@ -202,20 +214,57 @@ const FeatureBundle = () => {
         </motion.div>
 
         <AnimatePresence mode="wait">
-          {submitted ? (
+          {submitting ? (
             <motion.div
-              key="thanks"
+              key="submitting"
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="relative max-w-2xl mx-auto"
+            >
+              <div className="absolute -inset-6 bg-gradient-accent opacity-20 blur-3xl rounded-3xl animate-pulse" />
+              <div className="relative glass rounded-2xl p-10 md:p-14 text-center shadow-elevated overflow-hidden">
+                <div className="relative inline-flex w-16 h-16 rounded-2xl bg-accent-soft items-center justify-center mb-6">
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl border-2 border-accent border-t-transparent"
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }}
+                  />
+                  <Send className="w-6 h-6 text-accent-glow" strokeWidth={2} />
+                </div>
+                <h3 className="font-display text-2xl font-semibold mb-2">Submitting your bundle…</h3>
+                <p className="text-sm text-muted-foreground font-mono">
+                  Sealing {selected.size} features · {selectedIntegrations.size + customIntegrations.length} integrations
+                </p>
+                <motion.div
+                  className="mt-6 mx-auto h-0.5 bg-accent rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 1.05, ease: "easeInOut" }}
+                  style={{ maxWidth: 280 }}
+                />
+              </div>
+            </motion.div>
+          ) : submitted ? (
+            <motion.div
+              key="thanks"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="relative max-w-2xl mx-auto"
             >
               <div className="absolute -inset-6 bg-gradient-accent opacity-20 blur-3xl rounded-3xl" />
               <div className="relative glass rounded-2xl p-10 md:p-14 text-center shadow-elevated">
-                <div className="inline-flex w-16 h-16 rounded-2xl bg-accent items-center justify-center mb-6 shadow-accent">
+                <motion.div
+                  initial={{ scale: 0, rotate: -90 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.15, type: "spring", stiffness: 220, damping: 14 }}
+                  className="inline-flex w-16 h-16 rounded-2xl bg-accent items-center justify-center mb-6 shadow-accent"
+                >
                   <Check className="w-7 h-7 text-accent-foreground" strokeWidth={2.5} />
-                </div>
+                </motion.div>
                 <h3 className="font-display text-3xl font-semibold mb-3 text-gradient">
                   Thank you, we'll be in touch!
                 </h3>
@@ -316,10 +365,7 @@ const FeatureBundle = () => {
                             : "glass hover:border-border-strong"
                         }`}
                       >
-                        <Plug
-                          className={`w-3.5 h-3.5 ${isOn ? "text-accent-glow" : "text-muted-foreground"}`}
-                          strokeWidth={1.75}
-                        />
+                        <IntegrationIcon name={it.name} size={16} className="shrink-0" />
                         <span>{it.name}</span>
                         <span className="font-mono text-[10px] uppercase tracking-wider opacity-60">
                           {it.category}
@@ -452,8 +498,14 @@ const FeatureBundle = () => {
                   </div>
 
                   <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
-                    <Button type="submit" variant="accent" size="xl" className="group flex-1 sm:flex-initial">
-                      Request Early Access & Provide Feedback
+                    <Button
+                      type="submit"
+                      variant="accent"
+                      size="xl"
+                      disabled={submitting}
+                      className="group flex-1 sm:flex-initial"
+                    >
+                      {submitting ? "Submitting…" : "Request Early Access & Provide Feedback"}
                       <Send className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </Button>
                     <p className="text-xs text-muted-foreground">

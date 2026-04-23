@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import IntegrationIcon from "./IntegrationIcon";
 
 type Feature = { id: string; title: string; desc: string; icon: LucideIcon };
 type Category = { id: string; label: string; features: Feature[] };

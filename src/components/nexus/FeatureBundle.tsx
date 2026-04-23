@@ -113,12 +113,18 @@ const integrationCatalog: { name: string; category: string }[] = [
   { name: "REST API / Webhooks", category: "Custom" },
 ];
 
+// Pre-selected feature ids — gives users a visible cue that cards are interactive.
+const PRESELECTED = ["qr-checkin", "capacity-booking", "public-private", "legacy-import"];
+
 const FeatureBundle = () => {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selected, setSelected] = useState<Set<string>>(new Set(PRESELECTED));
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({ name: "", email: "", phone: "", useCase: "" });
-  const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(new Set());
+  const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(
+    new Set(["Google Workspace", "Slack", "Excel / CSV"]),
+  );
   const [customIntegrations, setCustomIntegrations] = useState<string[]>([]);
   const [customInput, setCustomInput] = useState("");
 

@@ -1,31 +1,32 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Database, FileSpreadsheet, Plug, Shuffle } from "lucide-react";
+import IntegrationIcon from "./IntegrationIcon";
 
-type Integration = { name: string; category: string; logo: string };
+type Integration = { name: string; category: string };
 
 const integrations: Integration[] = [
-  { name: "Google Workspace", category: "Calendar", logo: "G" },
-  { name: "Microsoft 365", category: "Calendar", logo: "M" },
-  { name: "Outlook", category: "Calendar", logo: "O" },
-  { name: "Slack", category: "Comms", logo: "#" },
-  { name: "Microsoft Teams", category: "Comms", logo: "T" },
-  { name: "Zoom", category: "Video", logo: "Z" },
-  { name: "Webex", category: "Video", logo: "W" },
-  { name: "Okta", category: "SSO", logo: "O" },
-  { name: "Azure AD", category: "SSO", logo: "A" },
-  { name: "BambooHR", category: "HRIS", logo: "B" },
-  { name: "Workday", category: "HRIS", logo: "W" },
-  { name: "Personio", category: "HRIS", logo: "P" },
-  { name: "SAP", category: "ERP", logo: "S" },
-  { name: "Salesforce", category: "CRM", logo: "S" },
-  { name: "HubSpot", category: "CRM", logo: "H" },
-  { name: "Excel / CSV", category: "Migration", logo: "X" },
-  { name: "Google Sheets", category: "Migration", logo: "G" },
-  { name: "Notion", category: "Docs", logo: "N" },
-  { name: "Jira", category: "PM", logo: "J" },
-  { name: "ServiceNow", category: "ITSM", logo: "S" },
-  { name: "Zapier", category: "Automation", logo: "Z" },
-  { name: "REST API / Webhooks", category: "Custom", logo: "{}" },
+  { name: "Google Workspace", category: "Calendar" },
+  { name: "Microsoft 365", category: "Calendar" },
+  { name: "Outlook", category: "Calendar" },
+  { name: "Slack", category: "Comms" },
+  { name: "Microsoft Teams", category: "Comms" },
+  { name: "Zoom", category: "Video" },
+  { name: "Webex", category: "Video" },
+  { name: "Okta", category: "SSO" },
+  { name: "Azure AD", category: "SSO" },
+  { name: "BambooHR", category: "HRIS" },
+  { name: "Workday", category: "HRIS" },
+  { name: "Personio", category: "HRIS" },
+  { name: "SAP", category: "ERP" },
+  { name: "Salesforce", category: "CRM" },
+  { name: "HubSpot", category: "CRM" },
+  { name: "Excel / CSV", category: "Migration" },
+  { name: "Google Sheets", category: "Migration" },
+  { name: "Notion", category: "Docs" },
+  { name: "Jira", category: "PM" },
+  { name: "ServiceNow", category: "ITSM" },
+  { name: "Zapier", category: "Automation" },
+  { name: "REST API / Webhooks", category: "Custom" },
 ];
 
 const migrationSteps = [
@@ -122,8 +123,8 @@ const Integrations = () => {
                 className="group glass rounded-xl p-4 hover:border-border-strong hover:-translate-y-0.5 transition-all duration-300"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-secondary text-accent-glow font-display font-semibold text-sm flex items-center justify-center group-hover:bg-accent-soft transition-colors">
-                    {it.logo}
+                  <div className="w-10 h-10 rounded-lg bg-secondary/60 flex items-center justify-center group-hover:bg-accent-soft transition-colors shrink-0">
+                    <IntegrationIcon name={it.name} size={22} />
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{it.name}</p>

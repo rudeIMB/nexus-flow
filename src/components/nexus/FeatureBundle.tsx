@@ -365,10 +365,7 @@ const FeatureBundle = () => {
                             : "glass hover:border-border-strong"
                         }`}
                       >
-                        <Plug
-                          className={`w-3.5 h-3.5 ${isOn ? "text-accent-glow" : "text-muted-foreground"}`}
-                          strokeWidth={1.75}
-                        />
+                        <IntegrationIcon name={it.name} size={16} className="shrink-0" />
                         <span>{it.name}</span>
                         <span className="font-mono text-[10px] uppercase tracking-wider opacity-60">
                           {it.category}

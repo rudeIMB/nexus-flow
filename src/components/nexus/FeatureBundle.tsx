@@ -498,8 +498,14 @@ const FeatureBundle = () => {
                   </div>
 
                   <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
-                    <Button type="submit" variant="accent" size="xl" className="group flex-1 sm:flex-initial">
-                      Request Early Access & Provide Feedback
+                    <Button
+                      type="submit"
+                      variant="accent"
+                      size="xl"
+                      disabled={submitting}
+                      className="group flex-1 sm:flex-initial"
+                    >
+                      {submitting ? "Submitting…" : "Request Early Access & Provide Feedback"}
                       <Send className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </Button>
                     <p className="text-xs text-muted-foreground">

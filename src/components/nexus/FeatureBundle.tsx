@@ -214,20 +214,57 @@ const FeatureBundle = () => {
         </motion.div>
 
         <AnimatePresence mode="wait">
-          {submitted ? (
+          {submitting ? (
             <motion.div
-              key="thanks"
+              key="submitting"
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="relative max-w-2xl mx-auto"
+            >
+              <div className="absolute -inset-6 bg-gradient-accent opacity-20 blur-3xl rounded-3xl animate-pulse" />
+              <div className="relative glass rounded-2xl p-10 md:p-14 text-center shadow-elevated overflow-hidden">
+                <div className="relative inline-flex w-16 h-16 rounded-2xl bg-accent-soft items-center justify-center mb-6">
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl border-2 border-accent border-t-transparent"
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }}
+                  />
+                  <Send className="w-6 h-6 text-accent-glow" strokeWidth={2} />
+                </div>
+                <h3 className="font-display text-2xl font-semibold mb-2">Submitting your bundle…</h3>
+                <p className="text-sm text-muted-foreground font-mono">
+                  Sealing {selected.size} features · {selectedIntegrations.size + customIntegrations.length} integrations
+                </p>
+                <motion.div
+                  className="mt-6 mx-auto h-0.5 bg-accent rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 1.05, ease: "easeInOut" }}
+                  style={{ maxWidth: 280 }}
+                />
+              </div>
+            </motion.div>
+          ) : submitted ? (
+            <motion.div
+              key="thanks"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="relative max-w-2xl mx-auto"
             >
               <div className="absolute -inset-6 bg-gradient-accent opacity-20 blur-3xl rounded-3xl" />
               <div className="relative glass rounded-2xl p-10 md:p-14 text-center shadow-elevated">
-                <div className="inline-flex w-16 h-16 rounded-2xl bg-accent items-center justify-center mb-6 shadow-accent">
+                <motion.div
+                  initial={{ scale: 0, rotate: -90 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.15, type: "spring", stiffness: 220, damping: 14 }}
+                  className="inline-flex w-16 h-16 rounded-2xl bg-accent items-center justify-center mb-6 shadow-accent"
+                >
                   <Check className="w-7 h-7 text-accent-foreground" strokeWidth={2.5} />
-                </div>
+                </motion.div>
                 <h3 className="font-display text-3xl font-semibold mb-3 text-gradient">
                   Thank you, we'll be in touch!
                 </h3>

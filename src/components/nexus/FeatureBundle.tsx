@@ -172,7 +172,9 @@ const FeatureBundle = () => {
     setCustomIntegrations(customIntegrations.filter((c) => c !== name));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxDjzb8rBmBmGuoryJnUEeHBH8PzSs_Pgz68GHU8-hu38qeEnFduQyvXlX1-TCqWxtLGg/exec";
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = leadSchema.safeParse(form);
     if (!result.success) {
@@ -186,13 +188,34 @@ const FeatureBundle = () => {
     }
     setErrors({});
     setSubmitting(true);
-    // Simulate request → show transition animation, then thank-you state.
-    setTimeout(() => {
+
+    try {
+      await fetch(SHEET_WEBHOOK_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          useCase: form.useCase,
+          selectedFeatures: [...selected].join(", "),
+          integrations: [...selectedIntegrations, ...customIntegrations].join(", "),
+        }),
+      });
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
       setSubmitting(false);
-      setSubmitted(true);
-      toast.success("Request sent — we'll be in touch shortly.");
-    }, 1100);
-  };
+      return;
+    }
+
+  // Keep the animation timing exactly as before
+  setTimeout(() => {
+    setSubmitting(false);
+    setSubmitted(true);
+    toast.success("Request sent — we'll be in touch shortly.");
+  }, 1100);
+};
 
   return (
     <section id="bundle" className="py-24 sm:py-32 relative scroll-mt-20">

@@ -555,14 +555,41 @@ const FeatureBundle = () => {
                       />
                     </Field>
                     <Field label="Phone" hint="optional">
-                      <Input
-                        type="tel"
-                        value={form.phone}
-                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        placeholder="+1 555 0100"
-                        maxLength={40}
-                        className="bg-input border-border h-11"
-                      />
+                      <div className="flex gap-2">
+                        <Select
+                          value={form.countryCode}
+                          onValueChange={(v) => setForm({ ...form, countryCode: v })}
+                        >
+                          <SelectTrigger
+                            className="bg-input border-border h-11 w-[110px] shrink-0 font-mono text-sm"
+                            aria-label="Country code"
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-72">
+                            {countryCodes.map((c) => (
+                              <SelectItem key={c.code} value={c.dial}>
+                                <span className="font-mono">
+                                  <span className="mr-2">{c.flag}</span>
+                                  {c.dial}
+                                  <span className="ml-2 text-muted-foreground">{c.name}</span>
+                                </span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          type="tel"
+                          inputMode="tel"
+                          value={form.phone}
+                          onChange={(e) =>
+                            setForm({ ...form, phone: e.target.value.replace(/[^\d\s\-().]/g, "") })
+                          }
+                          placeholder="555 0100"
+                          maxLength={20}
+                          className="bg-input border-border h-11 flex-1"
+                        />
+                      </div>
                     </Field>
                     <Field label="Organization size" hint="optional">
                       <Input

@@ -95,60 +95,63 @@ const leadSchema = z.object({
   useCase: z.string().trim().max(1000).optional().or(z.literal("")),
 });
 
-// Compact country dial-code list (ISO + dial code + flag emoji).
+// Country list with ISO code, dial code, name, and flag emoji.
+// Sorted alphabetically by name. Each entry uses a unique `value` (ISO|dial)
+// so countries that share a dial code (e.g. US/CA both +1) remain selectable.
 const countryCodes: { code: string; dial: string; name: string; flag: string }[] = [
-  { code: "US", dial: "+1", name: "United States", flag: "🇺🇸" },
+  { code: "DZ", dial: "+213", name: "Algeria", flag: "🇩🇿" },
+  { code: "AR", dial: "+54", name: "Argentina", flag: "🇦🇷" },
+  { code: "AU", dial: "+61", name: "Australia", flag: "🇦🇺" },
+  { code: "AT", dial: "+43", name: "Austria", flag: "🇦🇹" },
+  { code: "BD", dial: "+880", name: "Bangladesh", flag: "🇧🇩" },
+  { code: "BE", dial: "+32", name: "Belgium", flag: "🇧🇪" },
+  { code: "BR", dial: "+55", name: "Brazil", flag: "🇧🇷" },
   { code: "CA", dial: "+1", name: "Canada", flag: "🇨🇦" },
-  { code: "GB", dial: "+44", name: "United Kingdom", flag: "🇬🇧" },
+  { code: "CL", dial: "+56", name: "Chile", flag: "🇨🇱" },
+  { code: "CN", dial: "+86", name: "China", flag: "🇨🇳" },
+  { code: "CO", dial: "+57", name: "Colombia", flag: "🇨🇴" },
+  { code: "CZ", dial: "+420", name: "Czechia", flag: "🇨🇿" },
+  { code: "DK", dial: "+45", name: "Denmark", flag: "🇩🇰" },
+  { code: "EG", dial: "+20", name: "Egypt", flag: "🇪🇬" },
+  { code: "FI", dial: "+358", name: "Finland", flag: "🇫🇮" },
   { code: "FR", dial: "+33", name: "France", flag: "🇫🇷" },
   { code: "DE", dial: "+49", name: "Germany", flag: "🇩🇪" },
-  { code: "ES", dial: "+34", name: "Spain", flag: "🇪🇸" },
-  { code: "IT", dial: "+39", name: "Italy", flag: "🇮🇹" },
-  { code: "PT", dial: "+351", name: "Portugal", flag: "🇵🇹" },
-  { code: "NL", dial: "+31", name: "Netherlands", flag: "🇳🇱" },
-  { code: "BE", dial: "+32", name: "Belgium", flag: "🇧🇪" },
-  { code: "CH", dial: "+41", name: "Switzerland", flag: "🇨🇭" },
-  { code: "AT", dial: "+43", name: "Austria", flag: "🇦🇹" },
-  { code: "SE", dial: "+46", name: "Sweden", flag: "🇸🇪" },
-  { code: "NO", dial: "+47", name: "Norway", flag: "🇳🇴" },
-  { code: "DK", dial: "+45", name: "Denmark", flag: "🇩🇰" },
-  { code: "FI", dial: "+358", name: "Finland", flag: "🇫🇮" },
-  { code: "IE", dial: "+353", name: "Ireland", flag: "🇮🇪" },
-  { code: "PL", dial: "+48", name: "Poland", flag: "🇵🇱" },
-  { code: "CZ", dial: "+420", name: "Czechia", flag: "🇨🇿" },
-  { code: "RO", dial: "+40", name: "Romania", flag: "🇷🇴" },
   { code: "GR", dial: "+30", name: "Greece", flag: "🇬🇷" },
-  { code: "TR", dial: "+90", name: "Türkiye", flag: "🇹🇷" },
-  { code: "AE", dial: "+971", name: "UAE", flag: "🇦🇪" },
-  { code: "SA", dial: "+966", name: "Saudi Arabia", flag: "🇸🇦" },
-  { code: "IL", dial: "+972", name: "Israel", flag: "🇮🇱" },
-  { code: "EG", dial: "+20", name: "Egypt", flag: "🇪🇬" },
-  { code: "MA", dial: "+212", name: "Morocco", flag: "🇲🇦" },
-  { code: "ZA", dial: "+27", name: "South Africa", flag: "🇿🇦" },
-  { code: "NG", dial: "+234", name: "Nigeria", flag: "🇳🇬" },
-  { code: "KE", dial: "+254", name: "Kenya", flag: "🇰🇪" },
-  { code: "IN", dial: "+91", name: "India", flag: "🇮🇳" },
-  { code: "PK", dial: "+92", name: "Pakistan", flag: "🇵🇰" },
-  { code: "BD", dial: "+880", name: "Bangladesh", flag: "🇧🇩" },
-  { code: "CN", dial: "+86", name: "China", flag: "🇨🇳" },
   { code: "HK", dial: "+852", name: "Hong Kong", flag: "🇭🇰" },
-  { code: "TW", dial: "+886", name: "Taiwan", flag: "🇹🇼" },
-  { code: "JP", dial: "+81", name: "Japan", flag: "🇯🇵" },
-  { code: "KR", dial: "+82", name: "South Korea", flag: "🇰🇷" },
-  { code: "SG", dial: "+65", name: "Singapore", flag: "🇸🇬" },
-  { code: "MY", dial: "+60", name: "Malaysia", flag: "🇲🇾" },
+  { code: "IN", dial: "+91", name: "India", flag: "🇮🇳" },
   { code: "ID", dial: "+62", name: "Indonesia", flag: "🇮🇩" },
-  { code: "TH", dial: "+66", name: "Thailand", flag: "🇹🇭" },
-  { code: "VN", dial: "+84", name: "Vietnam", flag: "🇻🇳" },
-  { code: "PH", dial: "+63", name: "Philippines", flag: "🇵🇭" },
-  { code: "AU", dial: "+61", name: "Australia", flag: "🇦🇺" },
-  { code: "NZ", dial: "+64", name: "New Zealand", flag: "🇳🇿" },
+  { code: "IE", dial: "+353", name: "Ireland", flag: "🇮🇪" },
+  { code: "IL", dial: "+972", name: "Israel", flag: "🇮🇱" },
+  { code: "IT", dial: "+39", name: "Italy", flag: "🇮🇹" },
+  { code: "JP", dial: "+81", name: "Japan", flag: "🇯🇵" },
+  { code: "KE", dial: "+254", name: "Kenya", flag: "🇰🇪" },
+  { code: "MY", dial: "+60", name: "Malaysia", flag: "🇲🇾" },
   { code: "MX", dial: "+52", name: "Mexico", flag: "🇲🇽" },
-  { code: "BR", dial: "+55", name: "Brazil", flag: "🇧🇷" },
-  { code: "AR", dial: "+54", name: "Argentina", flag: "🇦🇷" },
-  { code: "CL", dial: "+56", name: "Chile", flag: "🇨🇱" },
-  { code: "CO", dial: "+57", name: "Colombia", flag: "🇨🇴" },
+  { code: "MA", dial: "+212", name: "Morocco", flag: "🇲🇦" },
+  { code: "NL", dial: "+31", name: "Netherlands", flag: "🇳🇱" },
+  { code: "NZ", dial: "+64", name: "New Zealand", flag: "🇳🇿" },
+  { code: "NG", dial: "+234", name: "Nigeria", flag: "🇳🇬" },
+  { code: "NO", dial: "+47", name: "Norway", flag: "🇳🇴" },
+  { code: "PK", dial: "+92", name: "Pakistan", flag: "🇵🇰" },
   { code: "PE", dial: "+51", name: "Peru", flag: "🇵🇪" },
+  { code: "PH", dial: "+63", name: "Philippines", flag: "🇵🇭" },
+  { code: "PL", dial: "+48", name: "Poland", flag: "🇵🇱" },
+  { code: "PT", dial: "+351", name: "Portugal", flag: "🇵🇹" },
+  { code: "RO", dial: "+40", name: "Romania", flag: "🇷🇴" },
+  { code: "SA", dial: "+966", name: "Saudi Arabia", flag: "🇸🇦" },
+  { code: "SG", dial: "+65", name: "Singapore", flag: "🇸🇬" },
+  { code: "ZA", dial: "+27", name: "South Africa", flag: "🇿🇦" },
+  { code: "KR", dial: "+82", name: "South Korea", flag: "🇰🇷" },
+  { code: "ES", dial: "+34", name: "Spain", flag: "🇪🇸" },
+  { code: "SE", dial: "+46", name: "Sweden", flag: "🇸🇪" },
+  { code: "CH", dial: "+41", name: "Switzerland", flag: "🇨🇭" },
+  { code: "TW", dial: "+886", name: "Taiwan", flag: "🇹🇼" },
+  { code: "TH", dial: "+66", name: "Thailand", flag: "🇹🇭" },
+  { code: "TR", dial: "+90", name: "Türkiye", flag: "🇹🇷" },
+  { code: "AE", dial: "+971", name: "United Arab Emirates", flag: "🇦🇪" },
+  { code: "GB", dial: "+44", name: "United Kingdom", flag: "🇬🇧" },
+  { code: "US", dial: "+1", name: "United States", flag: "🇺🇸" },
+  { code: "VN", dial: "+84", name: "Vietnam", flag: "🇻🇳" },
 ];
 
 const integrationCatalog: { name: string; category: string }[] = [
@@ -185,7 +188,7 @@ const FeatureBundle = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [form, setForm] = useState({ name: "", email: "", phone: "", countryCode: "+1", useCase: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", countryCode: "US|+1", useCase: "" });
   const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(
     new Set(["Google Workspace", "Slack", "Excel / CSV"]),
   );
@@ -254,7 +257,8 @@ const FeatureBundle = () => {
     setSubmitting(true);
 
     try {
-      const fullPhone = form.phone.trim() ? `${form.countryCode} ${form.phone.trim()}` : "";
+      const dial = form.countryCode.split("|")[1] ?? "";
+      const fullPhone = form.phone.trim() ? `${dial} ${form.phone.trim()}` : "";
       await fetch(SHEET_WEBHOOK_URL, {
         method: "POST",
         mode: "no-cors",
@@ -564,13 +568,26 @@ const FeatureBundle = () => {
                             className="bg-input border-border h-11 w-[110px] shrink-0 font-mono text-sm"
                             aria-label="Country code"
                           >
-                            <SelectValue />
+                            <SelectValue>
+                              {(() => {
+                                const sel = countryCodes.find(
+                                  (c) => `${c.code}|${c.dial}` === form.countryCode,
+                                );
+                                return sel ? (
+                                  <span className="font-mono">
+                                    <span className="mr-1.5">{sel.flag}</span>
+                                    {sel.dial}
+                                  </span>
+                                ) : null;
+                              })()}
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent className="max-h-72">
                             {countryCodes.map((c) => (
-                              <SelectItem key={c.code} value={c.dial}>
+                              <SelectItem key={c.code} value={`${c.code}|${c.dial}`}>
                                 <span className="font-mono">
                                   <span className="mr-2">{c.flag}</span>
+                                  <span className="text-muted-foreground mr-2">{c.code}</span>
                                   {c.dial}
                                   <span className="ml-2 text-muted-foreground">{c.name}</span>
                                 </span>

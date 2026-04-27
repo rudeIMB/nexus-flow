@@ -620,7 +620,14 @@ const FeatureBundle = () => {
                       disabled={submitting}
                       className="group flex-1 sm:flex-initial"
                     >
-                      {submitting ? "Submitting…" : "Request Early Access & Provide Feedback"}
+                      {submitting ? (
+                        "Submitting…"
+                      ) : (
+                        <>
+                          <span className="sm:hidden">Send Feedback</span>
+                          <span className="hidden sm:inline">Share Feedback & Register Interest</span>
+                        </>
+                      )}
                       <Send className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </Button>
                     <p className="text-xs text-muted-foreground">

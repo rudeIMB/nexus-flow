@@ -278,7 +278,7 @@ const FeatureBundle = () => {
   setTimeout(() => {
     setSubmitting(false);
     setSubmitted(true);
-    toast.success("Request sent — we'll be in touch shortly.");
+    toast.success("Feedback received — we'll be in touch shortly.");
   }, 1100);
 };
 

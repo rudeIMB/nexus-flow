@@ -296,8 +296,8 @@ const FeatureBundle = () => {
           <h2 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-gradient">
             Tell us what matters to your team.
           </h2>
-          <p className="mt-6 text-lg text-muted-foreground">
-            Pick the modules you'd actually use. Your selections shape the early-access rollout.
+                  <p className="mt-6 text-lg text-muted-foreground">
+            Pick the modules you'd actually use. Your feedback shapes what we build next.
           </p>
         </motion.div>
 
@@ -354,16 +354,16 @@ const FeatureBundle = () => {
                   <Check className="w-7 h-7 text-accent-foreground" strokeWidth={2.5} />
                 </motion.div>
                 <h3 className="font-display text-3xl font-semibold mb-3 text-gradient">
-                  Thank you, we'll be in touch!
+                  Thanks — your feedback is in.
                 </h3>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                  Your feedback on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features
+                  Your input on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features
                   and <span className="text-foreground font-medium">{selectedIntegrations.size + customIntegrations.length}</span> integrations has been recorded.
-                  We'll reach out within 48 hours with your early-access invitation.
+                  We'll reach out within 48 hours to keep you posted as Nexus takes shape.
                 </p>
                 <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-soft text-xs font-mono text-accent-glow">
                   <Sparkles className="w-3.5 h-3.5" />
-                  Cohort confirmed
+                  Feedback received
                 </div>
               </div>
             </motion.div>
@@ -526,7 +526,7 @@ const FeatureBundle = () => {
                     <div>
                       <h3 className="font-display text-2xl font-semibold">Your details</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        We use this only to follow up on your early-access request.
+                        We use this only to follow up on your feedback.
                       </p>
                     </div>
                     <div className="font-mono text-xs px-3 py-1.5 rounded-full bg-accent-soft text-accent-glow self-start">

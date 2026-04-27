@@ -14,13 +14,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import IntegrationIcon from "./IntegrationIcon";
 import rawCountryCodes from "@/data/countryCodes.json";
@@ -155,6 +158,7 @@ const FeatureBundle = () => {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({ name: "", email: "", phone: "", countryCode: "US|+1", useCase: "" });
+  const [countryOpen, setCountryOpen] = useState(false);
   const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(
     new Set(["Google Workspace", "Slack", "Excel / CSV"]),
   );

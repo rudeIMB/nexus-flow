@@ -14,6 +14,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import IntegrationIcon from "./IntegrationIcon";
 
@@ -84,8 +91,65 @@ const leadSchema = z.object({
   name: z.string().trim().nonempty({ message: "Name is required" }).max(100),
   email: z.string().trim().email({ message: "Valid email required" }).max(255),
   phone: z.string().trim().max(40).optional().or(z.literal("")),
+  countryCode: z.string().trim().max(8).optional().or(z.literal("")),
   useCase: z.string().trim().max(1000).optional().or(z.literal("")),
 });
+
+// Compact country dial-code list (ISO + dial code + flag emoji).
+const countryCodes: { code: string; dial: string; name: string; flag: string }[] = [
+  { code: "US", dial: "+1", name: "United States", flag: "🇺🇸" },
+  { code: "CA", dial: "+1", name: "Canada", flag: "🇨🇦" },
+  { code: "GB", dial: "+44", name: "United Kingdom", flag: "🇬🇧" },
+  { code: "FR", dial: "+33", name: "France", flag: "🇫🇷" },
+  { code: "DE", dial: "+49", name: "Germany", flag: "🇩🇪" },
+  { code: "ES", dial: "+34", name: "Spain", flag: "🇪🇸" },
+  { code: "IT", dial: "+39", name: "Italy", flag: "🇮🇹" },
+  { code: "PT", dial: "+351", name: "Portugal", flag: "🇵🇹" },
+  { code: "NL", dial: "+31", name: "Netherlands", flag: "🇳🇱" },
+  { code: "BE", dial: "+32", name: "Belgium", flag: "🇧🇪" },
+  { code: "CH", dial: "+41", name: "Switzerland", flag: "🇨🇭" },
+  { code: "AT", dial: "+43", name: "Austria", flag: "🇦🇹" },
+  { code: "SE", dial: "+46", name: "Sweden", flag: "🇸🇪" },
+  { code: "NO", dial: "+47", name: "Norway", flag: "🇳🇴" },
+  { code: "DK", dial: "+45", name: "Denmark", flag: "🇩🇰" },
+  { code: "FI", dial: "+358", name: "Finland", flag: "🇫🇮" },
+  { code: "IE", dial: "+353", name: "Ireland", flag: "🇮🇪" },
+  { code: "PL", dial: "+48", name: "Poland", flag: "🇵🇱" },
+  { code: "CZ", dial: "+420", name: "Czechia", flag: "🇨🇿" },
+  { code: "RO", dial: "+40", name: "Romania", flag: "🇷🇴" },
+  { code: "GR", dial: "+30", name: "Greece", flag: "🇬🇷" },
+  { code: "TR", dial: "+90", name: "Türkiye", flag: "🇹🇷" },
+  { code: "AE", dial: "+971", name: "UAE", flag: "🇦🇪" },
+  { code: "SA", dial: "+966", name: "Saudi Arabia", flag: "🇸🇦" },
+  { code: "IL", dial: "+972", name: "Israel", flag: "🇮🇱" },
+  { code: "EG", dial: "+20", name: "Egypt", flag: "🇪🇬" },
+  { code: "MA", dial: "+212", name: "Morocco", flag: "🇲🇦" },
+  { code: "ZA", dial: "+27", name: "South Africa", flag: "🇿🇦" },
+  { code: "NG", dial: "+234", name: "Nigeria", flag: "🇳🇬" },
+  { code: "KE", dial: "+254", name: "Kenya", flag: "🇰🇪" },
+  { code: "IN", dial: "+91", name: "India", flag: "🇮🇳" },
+  { code: "PK", dial: "+92", name: "Pakistan", flag: "🇵🇰" },
+  { code: "BD", dial: "+880", name: "Bangladesh", flag: "🇧🇩" },
+  { code: "CN", dial: "+86", name: "China", flag: "🇨🇳" },
+  { code: "HK", dial: "+852", name: "Hong Kong", flag: "🇭🇰" },
+  { code: "TW", dial: "+886", name: "Taiwan", flag: "🇹🇼" },
+  { code: "JP", dial: "+81", name: "Japan", flag: "🇯🇵" },
+  { code: "KR", dial: "+82", name: "South Korea", flag: "🇰🇷" },
+  { code: "SG", dial: "+65", name: "Singapore", flag: "🇸🇬" },
+  { code: "MY", dial: "+60", name: "Malaysia", flag: "🇲🇾" },
+  { code: "ID", dial: "+62", name: "Indonesia", flag: "🇮🇩" },
+  { code: "TH", dial: "+66", name: "Thailand", flag: "🇹🇭" },
+  { code: "VN", dial: "+84", name: "Vietnam", flag: "🇻🇳" },
+  { code: "PH", dial: "+63", name: "Philippines", flag: "🇵🇭" },
+  { code: "AU", dial: "+61", name: "Australia", flag: "🇦🇺" },
+  { code: "NZ", dial: "+64", name: "New Zealand", flag: "🇳🇿" },
+  { code: "MX", dial: "+52", name: "Mexico", flag: "🇲🇽" },
+  { code: "BR", dial: "+55", name: "Brazil", flag: "🇧🇷" },
+  { code: "AR", dial: "+54", name: "Argentina", flag: "🇦🇷" },
+  { code: "CL", dial: "+56", name: "Chile", flag: "🇨🇱" },
+  { code: "CO", dial: "+57", name: "Colombia", flag: "🇨🇴" },
+  { code: "PE", dial: "+51", name: "Peru", flag: "🇵🇪" },
+];
 
 const integrationCatalog: { name: string; category: string }[] = [
   { name: "Google Workspace", category: "Calendar" },
@@ -121,7 +185,7 @@ const FeatureBundle = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [form, setForm] = useState({ name: "", email: "", phone: "", useCase: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", countryCode: "+1", useCase: "" });
   const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(
     new Set(["Google Workspace", "Slack", "Excel / CSV"]),
   );
@@ -190,6 +254,7 @@ const FeatureBundle = () => {
     setSubmitting(true);
 
     try {
+      const fullPhone = form.phone.trim() ? `${form.countryCode} ${form.phone.trim()}` : "";
       await fetch(SHEET_WEBHOOK_URL, {
         method: "POST",
         mode: "no-cors",
@@ -197,7 +262,7 @@ const FeatureBundle = () => {
         body: JSON.stringify({
           name: form.name,
           email: form.email,
-          phone: form.phone,
+          phone: fullPhone,
           useCase: form.useCase,
           selectedFeatures: [...selected].join(", "),
           integrations: [...selectedIntegrations, ...customIntegrations].join(", "),
@@ -213,7 +278,7 @@ const FeatureBundle = () => {
   setTimeout(() => {
     setSubmitting(false);
     setSubmitted(true);
-    toast.success("Request sent — we'll be in touch shortly.");
+    toast.success("Feedback received — we'll be in touch shortly.");
   }, 1100);
 };
 
@@ -231,8 +296,8 @@ const FeatureBundle = () => {
           <h2 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-gradient">
             Tell us what matters to your team.
           </h2>
-          <p className="mt-6 text-lg text-muted-foreground">
-            Pick the modules you'd actually use. Your selections shape the early-access rollout.
+                  <p className="mt-6 text-lg text-muted-foreground">
+            Pick the modules you'd actually use. Your feedback shapes what we build next.
           </p>
         </motion.div>
 
@@ -289,16 +354,16 @@ const FeatureBundle = () => {
                   <Check className="w-7 h-7 text-accent-foreground" strokeWidth={2.5} />
                 </motion.div>
                 <h3 className="font-display text-3xl font-semibold mb-3 text-gradient">
-                  Thank you, we'll be in touch!
+                  Thanks — your feedback is in.
                 </h3>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                  Your feedback on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features
+                  Your input on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features
                   and <span className="text-foreground font-medium">{selectedIntegrations.size + customIntegrations.length}</span> integrations has been recorded.
-                  We'll reach out within 48 hours with your early-access invitation.
+                  We'll reach out within 48 hours to keep you posted as Nexus takes shape.
                 </p>
                 <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-soft text-xs font-mono text-accent-glow">
                   <Sparkles className="w-3.5 h-3.5" />
-                  Cohort confirmed
+                  Feedback received
                 </div>
               </div>
             </motion.div>
@@ -461,7 +526,7 @@ const FeatureBundle = () => {
                     <div>
                       <h3 className="font-display text-2xl font-semibold">Your details</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        We use this only to follow up on your early-access request.
+                        We use this only to follow up on your feedback.
                       </p>
                     </div>
                     <div className="font-mono text-xs px-3 py-1.5 rounded-full bg-accent-soft text-accent-glow self-start">
@@ -490,14 +555,41 @@ const FeatureBundle = () => {
                       />
                     </Field>
                     <Field label="Phone" hint="optional">
-                      <Input
-                        type="tel"
-                        value={form.phone}
-                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        placeholder="+1 555 0100"
-                        maxLength={40}
-                        className="bg-input border-border h-11"
-                      />
+                      <div className="flex gap-2">
+                        <Select
+                          value={form.countryCode}
+                          onValueChange={(v) => setForm({ ...form, countryCode: v })}
+                        >
+                          <SelectTrigger
+                            className="bg-input border-border h-11 w-[110px] shrink-0 font-mono text-sm"
+                            aria-label="Country code"
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-72">
+                            {countryCodes.map((c) => (
+                              <SelectItem key={c.code} value={c.dial}>
+                                <span className="font-mono">
+                                  <span className="mr-2">{c.flag}</span>
+                                  {c.dial}
+                                  <span className="ml-2 text-muted-foreground">{c.name}</span>
+                                </span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          type="tel"
+                          inputMode="tel"
+                          value={form.phone}
+                          onChange={(e) =>
+                            setForm({ ...form, phone: e.target.value.replace(/[^\d\s\-().]/g, "") })
+                          }
+                          placeholder="555 0100"
+                          maxLength={20}
+                          className="bg-input border-border h-11 flex-1"
+                        />
+                      </div>
                     </Field>
                     <Field label="Organization size" hint="optional">
                       <Input
@@ -528,7 +620,14 @@ const FeatureBundle = () => {
                       disabled={submitting}
                       className="group flex-1 sm:flex-initial"
                     >
-                      {submitting ? "Submitting…" : "Request Early Access & Provide Feedback"}
+                      {submitting ? (
+                        "Submitting…"
+                      ) : (
+                        <>
+                          <span className="sm:hidden">Send Feedback</span>
+                          <span className="hidden sm:inline">Share Feedback & Register Interest</span>
+                        </>
+                      )}
                       <Send className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </Button>
                     <p className="text-xs text-muted-foreground">

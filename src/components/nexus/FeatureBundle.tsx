@@ -568,13 +568,26 @@ const FeatureBundle = () => {
                             className="bg-input border-border h-11 w-[110px] shrink-0 font-mono text-sm"
                             aria-label="Country code"
                           >
-                            <SelectValue />
+                            <SelectValue>
+                              {(() => {
+                                const sel = countryCodes.find(
+                                  (c) => `${c.code}|${c.dial}` === form.countryCode,
+                                );
+                                return sel ? (
+                                  <span className="font-mono">
+                                    <span className="mr-1.5">{sel.flag}</span>
+                                    {sel.dial}
+                                  </span>
+                                ) : null;
+                              })()}
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent className="max-h-72">
                             {countryCodes.map((c) => (
-                              <SelectItem key={c.code} value={c.dial}>
+                              <SelectItem key={c.code} value={`${c.code}|${c.dial}`}>
                                 <span className="font-mono">
                                   <span className="mr-2">{c.flag}</span>
+                                  <span className="text-muted-foreground mr-2">{c.code}</span>
                                   {c.dial}
                                   <span className="ml-2 text-muted-foreground">{c.name}</span>
                                 </span>

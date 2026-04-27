@@ -185,7 +185,7 @@ const FeatureBundle = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [form, setForm] = useState({ name: "", email: "", phone: "", useCase: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", countryCode: "+1", useCase: "" });
   const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(
     new Set(["Google Workspace", "Slack", "Excel / CSV"]),
   );
@@ -254,6 +254,7 @@ const FeatureBundle = () => {
     setSubmitting(true);
 
     try {
+      const fullPhone = form.phone.trim() ? `${form.countryCode} ${form.phone.trim()}` : "";
       await fetch(SHEET_WEBHOOK_URL, {
         method: "POST",
         mode: "no-cors",
@@ -261,7 +262,7 @@ const FeatureBundle = () => {
         body: JSON.stringify({
           name: form.name,
           email: form.email,
-          phone: form.phone,
+          phone: fullPhone,
           useCase: form.useCase,
           selectedFeatures: [...selected].join(", "),
           integrations: [...selectedIntegrations, ...customIntegrations].join(", "),

@@ -530,41 +530,71 @@ const FeatureBundle = () => {
                     </Field>
                     <Field label="Phone" hint="optional">
                       <div className="flex gap-2">
-                        <Select
-                          value={form.countryCode}
-                          onValueChange={(v) => setForm({ ...form, countryCode: v })}
-                        >
-                          <SelectTrigger
-                            className="bg-input border-border h-11 w-[110px] shrink-0 font-mono text-sm"
-                            aria-label="Country code"
-                          >
-                            <SelectValue>
+                        <Popover open={countryOpen} onOpenChange={setCountryOpen}>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              role="combobox"
+                              aria-expanded={countryOpen}
+                              aria-label="Country code"
+                              className="flex h-11 w-[110px] shrink-0 items-center justify-between rounded-md border border-border bg-input px-3 py-2 font-mono text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            >
                               {(() => {
                                 const sel = countryCodes.find(
                                   (c) => `${c.code}|${c.dial}` === form.countryCode,
                                 );
                                 return sel ? (
-                                  <span className="font-mono">
-                                    <span className="mr-1.5">{sel.flag}</span>
-                                    {sel.dial}
+                                  <span className="flex items-center gap-1.5 truncate">
+                                    <span>{sel.flag}</span>
+                                    <span>{sel.dial}</span>
                                   </span>
-                                ) : null;
+                                ) : (
+                                  <span className="text-muted-foreground">Code</span>
+                                );
                               })()}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent className="max-h-72">
-                            {countryCodes.map((c) => (
-                              <SelectItem key={c.code} value={`${c.code}|${c.dial}`}>
-                                <span className="font-mono">
-                                  <span className="mr-2">{c.flag}</span>
-                                  <span className="text-muted-foreground mr-2">{c.code}</span>
-                                  {c.dial}
-                                  <span className="ml-2 text-muted-foreground">{c.name}</span>
-                                </span>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                              <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            align="start"
+                            className="w-[280px] p-0"
+                          >
+                            <Command
+                              filter={(value, search) => {
+                                if (!search) return 1;
+                                const q = search.toLowerCase();
+                                return value.toLowerCase().includes(q) ? 1 : 0;
+                              }}
+                            >
+                              <CommandInput placeholder="Search country or code…" />
+                              <CommandList>
+                                <CommandEmpty>No country found.</CommandEmpty>
+                                <CommandGroup>
+                                  {countryCodes.map((c) => {
+                                    const value = `${c.code}|${c.dial}`;
+                                    const searchValue = `${c.name} ${c.code} ${c.dial}`;
+                                    return (
+                                      <CommandItem
+                                        key={value}
+                                        value={searchValue}
+                                        onSelect={() => {
+                                          setForm({ ...form, countryCode: value });
+                                          setCountryOpen(false);
+                                        }}
+                                        className="font-mono text-sm"
+                                      >
+                                        <span className="mr-2">{c.flag}</span>
+                                        <span className="text-muted-foreground mr-2 w-7">{c.code}</span>
+                                        <span className="mr-2 w-12">{c.dial}</span>
+                                        <span className="text-muted-foreground truncate">{c.name}</span>
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                         <Input
                           type="tel"
                           inputMode="tel"

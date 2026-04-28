@@ -7,7 +7,7 @@ import {
   EyeOff, ShieldCheck, CalendarOff, Hourglass,
   ConciergeBell, BellRing, FileText,
   TrendingUp, BarChart3, AlertTriangle,
-  Database, Server, Webhook,
+  Database, Server, Cloud, Webhook,
   Check, Send, Sparkles, Plug, Plus, X, type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -85,7 +85,8 @@ const categories: Category[] = [
     label: "Integration & Deployment",
     features: [
       { id: "legacy-import", title: "Legacy-to-Cloud Importer", desc: "Migrate from Excel & legacy spreadsheets.", icon: Database },
-      { id: "hybrid-deploy", title: "Hybrid Deployment", desc: "On-Premise or Cloud SaaS.", icon: Server },
+      { id: "saas-deploy", title: "Cloud SaaS", desc: "Hosted, managed, always up to date.", icon: Cloud },
+      { id: "onprem-deploy", title: "On-Premise", desc: "Self-hosted in your own infrastructure.", icon: Server },
       { id: "api-webhooks", title: "Universal API/Webhooks", desc: "HR, Slack, building management.", icon: Webhook },
     ],
   },

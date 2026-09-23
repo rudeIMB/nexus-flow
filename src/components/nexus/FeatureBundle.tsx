@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useMemo } from "react";
 import { z } from "zod";
+import { trackLead } from "@/lib/meta-pixel";
 import {
   QrCode, ListChecks, Map, Ghost,
   Boxes, Coffee, Maximize2, Wrench,
@@ -253,6 +254,7 @@ const FeatureBundle = () => {
   setTimeout(() => {
     setSubmitting(false);
     setSubmitted(true);
+    trackLead();
     toast.success("Feedback received — we'll be in touch shortly.");
   }, 1100);
 };

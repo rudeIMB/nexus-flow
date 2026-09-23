@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom";
 import { Hexagon, Cloud, Server, Github, Twitter, Linkedin, type LucideIcon } from "lucide-react";
+import { openCookieSettings } from "@/lib/meta-pixel";
 
 const Footer = () => {
   return (
@@ -22,7 +24,27 @@ const Footer = () => {
 
           <FooterCol title="Product" items={["Features", "Receptionist View", "Privacy Tiers", "Integrations", "Roadmap"]} />
           <FooterCol title="Company" items={["About", "Pricing", "Customers", "Changelog", "Press"]} />
-          <FooterCol title="Legal" items={["Privacy Policy", "Terms of Service", "GDPR", "Security", "Cookies"]} />
+          <div>
+            <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-4">Legal</h4>
+            <ul className="space-y-2.5">
+              <li>
+                <Link to="/privacy" className="text-sm hover:text-accent-glow transition-colors">Privacy Policy</Link>
+              </li>
+              {["Terms of Service", "GDPR", "Security"].map((i) => (
+                <li key={i}>
+                  <a href="#" className="text-sm hover:text-accent-glow transition-colors">{i}</a>
+                </li>
+              ))}
+              <li>
+                <button
+                  onClick={openCookieSettings}
+                  className="text-sm hover:text-accent-glow transition-colors"
+                >
+                  Cookie settings
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

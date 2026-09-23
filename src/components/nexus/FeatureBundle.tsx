@@ -253,6 +253,7 @@ const FeatureBundle = () => {
   setTimeout(() => {
     setSubmitting(false);
     setSubmitted(true);
+    trackLead();
     toast.success("Feedback received — we'll be in touch shortly.");
   }, 1100);
 };

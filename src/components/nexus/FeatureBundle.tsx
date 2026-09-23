@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useMemo } from "react";
 import { z } from "zod";
+import { trackLead } from "@/lib/meta-pixel";
 import {
   QrCode, ListChecks, Map, Ghost,
   Boxes, Coffee, Maximize2, Wrench,

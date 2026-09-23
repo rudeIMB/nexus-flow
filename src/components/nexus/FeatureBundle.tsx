@@ -174,40 +174,40 @@ const FeatureBundle = () => {
 
   const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxDjzb8rBmBmGuoryJnUEeHBH8PzSs_Pgz68GHU8-hu38qeEnFduQyvXlX1-TCqWxtLGg/exec";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = leadSchema.safeParse(form);
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach((i) => {
-        if (i.path[0]) fieldErrors[i.path[0] as string] = i.message;
-      });
-      setErrors(fieldErrors);
-      toast.error("Please fix the highlighted fields.");
-      return;
-    }
-    setErrors({});
-    setSubmitting(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  const result = leadSchema.safeParse(form);
+  if (!result.success) {
+    const fieldErrors: Record<string, string> = {};
+    result.error.issues.forEach((i) => {
+      if (i.path[0]) fieldErrors[i.path[0] as string] = i.message;
+    });
+    setErrors(fieldErrors);
+    toast.error("Please fix the highlighted fields.");
+    return;
+  }
+  setErrors({});
+  setSubmitting(true);
 
-    try {
-      await fetch(SHEET_WEBHOOK_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          useCase: form.useCase,
-          selectedFeatures: [...selected].join(", "),
-          integrations: [...selectedIntegrations, ...customIntegrations].join(", "),
-        }),
-      });
-    } catch (err) {
-      toast.error("Something went wrong. Please try again.");
-      setSubmitting(false);
-      return;
-    }
+  try {
+    await fetch(SHEET_WEBHOOK_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        useCase: form.useCase,
+        selectedFeatures: [...selected].join(", "),
+        integrations: [...selectedIntegrations, ...customIntegrations].join(", "),
+      }),
+    });
+  } catch (err) {
+    toast.error("Something went wrong. Please try again.");
+    setSubmitting(false);
+    return;
+  }
 
   // Keep the animation timing exactly as before
   setTimeout(() => {

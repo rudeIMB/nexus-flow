@@ -32,22 +32,23 @@ function loadPixel() {
   if (initialized) return;
   initialized = true;
 
-  const w = window as unknown as Record<string, unknown>;
-  if (!w.fbq) {
-    const fbq = function (...args: unknown[]) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const q = (fbq as any);
-      q.queue ? q.queue.push(args) : (q.queue = [args]);
-    } as unknown as Record<string, unknown>;
-    fbq.loaded = true;
-    fbq.version = "2.0";
-    fbq.queue = [];
-    w.fbq = fbq;
-    w._fbq = fbq;
-    const s = document.createElement("script");
-    s.async = true;
-    s.src = "https://connect.facebook.net/en_US/fbevents.js";
-    document.head.appendChild(s);
+  // Official Meta pixel snippet.
+  const f = window as unknown as Record<string, any>;
+  const b = document;
+  if (!f.fbq) {
+    const n: any = (f.fbq = function (...args: unknown[]) {
+      n.callMethod ? n.callMethod.apply(n, args) : n.queue.push(args);
+    });
+    if (!f._fbq) f._fbq = n;
+    n.push = n;
+    n.loaded = true;
+    n.version = "2.0";
+    n.queue = [];
+    const t = b.createElement("script");
+    t.async = true;
+    t.src = "https://connect.facebook.net/en_US/fbevents.js";
+    const s = b.getElementsByTagName("script")[0];
+    s.parentNode?.insertBefore(t, s);
   }
   // Deny by default until region/consent is resolved.
   window.fbq!("consent", "revoke");

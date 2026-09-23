@@ -95,8 +95,10 @@ function grantAndTrack() {
 export async function initMetaPixel() {
   loadPixel();
   const region = await detectRegion();
+  // Unknown (XX) or Tor (T1) regions are treated as consent-required.
+  const needsConsent = CONSENT_REGIONS.has(region) || region === "XX" || region === "T1";
 
-  if (!CONSENT_REGIONS.has(region)) {
+  if (!needsConsent) {
     grantAndTrack();
     return;
   }

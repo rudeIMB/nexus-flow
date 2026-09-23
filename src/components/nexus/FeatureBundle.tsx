@@ -1,21 +1,33 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useMemo } from "react";
 import { z } from "zod";
+import { trackLead } from "@/lib/meta-pixel";
 import {
   QrCode, ListChecks, Map, Ghost,
   Boxes, Coffee, Maximize2, Wrench,
   EyeOff, ShieldCheck, CalendarOff, Hourglass,
   ConciergeBell, BellRing, FileText,
   TrendingUp, BarChart3, AlertTriangle,
-  Database, Server, Webhook,
+  Database, Server, Cloud, Webhook,
   Check, Send, Sparkles, Plug, Plus, X, type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import IntegrationIcon from "./IntegrationIcon";
+import rawCountryCodes from "@/data/countryCodes.json";
 
 type Feature = { id: string; title: string; desc: string; icon: LucideIcon };
 type Category = { id: string; label: string; features: Feature[] };
@@ -74,7 +86,8 @@ const categories: Category[] = [
     label: "Integration & Deployment",
     features: [
       { id: "legacy-import", title: "Legacy-to-Cloud Importer", desc: "Migrate from Excel & legacy spreadsheets.", icon: Database },
-      { id: "hybrid-deploy", title: "Hybrid Deployment", desc: "On-Premise or Cloud SaaS.", icon: Server },
+      { id: "saas-deploy", title: "Cloud SaaS", desc: "Hosted, managed, always up to date.", icon: Cloud },
+      { id: "onprem-deploy", title: "On-Premise", desc: "Self-hosted in your own infrastructure.", icon: Server },
       { id: "api-webhooks", title: "Universal API/Webhooks", desc: "HR, Slack, building management.", icon: Webhook },
     ],
   },
@@ -84,8 +97,33 @@ const leadSchema = z.object({
   name: z.string().trim().nonempty({ message: "Name is required" }).max(100),
   email: z.string().trim().email({ message: "Valid email required" }).max(255),
   phone: z.string().trim().max(40).optional().or(z.literal("")),
+  countryCode: z.string().trim().max(8).optional().or(z.literal("")),
   useCase: z.string().trim().max(1000).optional().or(z.literal("")),
 });
+
+// Country list loaded from JSON. We derive the flag emoji from the ISO code
+// (regional indicator symbols), and sort alphabetically by name.
+// Each entry uses a unique `value` (ISO|dial) so countries that share a dial
+// code (e.g. US/CA both +1) remain selectable.
+const isoToFlag = (code: string): string => {
+  if (!code || code.length !== 2) return "🏳️";
+  const A = 0x1f1e6;
+  const a = "A".charCodeAt(0);
+  return String.fromCodePoint(
+    A + (code.charCodeAt(0) - a),
+    A + (code.charCodeAt(1) - a),
+  );
+};
+
+const countryCodes: { code: string; dial: string; name: string; flag: string }[] =
+  (rawCountryCodes as { name: string; dial_code: string; code: string }[])
+    .map((c) => ({
+      code: c.code,
+      dial: c.dial_code,
+      name: c.name,
+      flag: isoToFlag(c.code),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
 const integrationCatalog: { name: string; category: string }[] = [
   { name: "Google Workspace", category: "Calendar" },
@@ -121,7 +159,8 @@ const FeatureBundle = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [form, setForm] = useState({ name: "", email: "", phone: "", useCase: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", countryCode: "US|+1", useCase: "" });
+  const [countryOpen, setCountryOpen] = useState(false);
   const [selectedIntegrations, setSelectedIntegrations] = useState<Set<string>>(
     new Set(["Google Workspace", "Slack", "Excel / CSV"]),
   );
@@ -190,6 +229,8 @@ const handleSubmit = async (e: React.FormEvent) => {
   setSubmitting(true);
 
   try {
+      const dial = form.countryCode.split("|")[1] ?? "";
+      const fullPhone = form.phone.trim() ? `${dial} ${form.phone.trim()}` : "";
     await fetch(SHEET_WEBHOOK_URL, {
       method: "POST",
       mode: "no-cors",
@@ -213,7 +254,8 @@ const handleSubmit = async (e: React.FormEvent) => {
   setTimeout(() => {
     setSubmitting(false);
     setSubmitted(true);
-    toast.success("Request sent — we'll be in touch shortly.");
+    trackLead();
+    toast.success("Feedback received — we'll be in touch shortly.");
   }, 1100);
 };
 
@@ -231,8 +273,8 @@ const handleSubmit = async (e: React.FormEvent) => {
           <h2 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-gradient">
             Tell us what matters to your team.
           </h2>
-          <p className="mt-6 text-lg text-muted-foreground">
-            Pick the modules you'd actually use. Your selections shape the early-access rollout.
+                  <p className="mt-6 text-lg text-muted-foreground">
+            Pick the modules you'd actually use. Your feedback shapes what we build next.
           </p>
         </motion.div>
 
@@ -289,16 +331,16 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <Check className="w-7 h-7 text-accent-foreground" strokeWidth={2.5} />
                 </motion.div>
                 <h3 className="font-display text-3xl font-semibold mb-3 text-gradient">
-                  Thank you, we'll be in touch!
+                  Thanks — your feedback is in.
                 </h3>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                  Your feedback on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features
+                  Your input on <span className="text-foreground font-medium">{selected.size} of {totalCount}</span> features
                   and <span className="text-foreground font-medium">{selectedIntegrations.size + customIntegrations.length}</span> integrations has been recorded.
-                  We'll reach out within 48 hours with your early-access invitation.
+                  We'll reach out within 48 hours to keep you posted as Nexus takes shape.
                 </p>
                 <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-soft text-xs font-mono text-accent-glow">
                   <Sparkles className="w-3.5 h-3.5" />
-                  Cohort confirmed
+                  Feedback received
                 </div>
               </div>
             </motion.div>
@@ -461,7 +503,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <div>
                       <h3 className="font-display text-2xl font-semibold">Your details</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        We use this only to follow up on your early-access request.
+                        We use this only to follow up on your feedback.
                       </p>
                     </div>
                     <div className="font-mono text-xs px-3 py-1.5 rounded-full bg-accent-soft text-accent-glow self-start">
@@ -490,14 +532,84 @@ const handleSubmit = async (e: React.FormEvent) => {
                       />
                     </Field>
                     <Field label="Phone" hint="optional">
-                      <Input
-                        type="tel"
-                        value={form.phone}
-                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        placeholder="+1 555 0100"
-                        maxLength={40}
-                        className="bg-input border-border h-11"
-                      />
+                      <div className="flex gap-2">
+                        <Popover open={countryOpen} onOpenChange={setCountryOpen}>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              role="combobox"
+                              aria-expanded={countryOpen}
+                              aria-label="Country code"
+                              className="flex h-11 w-[110px] shrink-0 items-center justify-between rounded-md border border-border bg-input px-3 py-2 font-mono text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            >
+                              {(() => {
+                                const sel = countryCodes.find(
+                                  (c) => `${c.code}|${c.dial}` === form.countryCode,
+                                );
+                                return sel ? (
+                                  <span className="flex items-center gap-1.5 truncate">
+                                    <span>{sel.flag}</span>
+                                    <span>{sel.dial}</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-muted-foreground">Code</span>
+                                );
+                              })()}
+                              <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            align="start"
+                            className="w-[280px] p-0"
+                          >
+                            <Command
+                              filter={(value, search) => {
+                                if (!search) return 1;
+                                const q = search.toLowerCase();
+                                return value.toLowerCase().includes(q) ? 1 : 0;
+                              }}
+                            >
+                              <CommandInput placeholder="Search country or code…" />
+                              <CommandList>
+                                <CommandEmpty>No country found.</CommandEmpty>
+                                <CommandGroup>
+                                  {countryCodes.map((c) => {
+                                    const value = `${c.code}|${c.dial}`;
+                                    const searchValue = `${c.name} ${c.code} ${c.dial}`;
+                                    return (
+                                      <CommandItem
+                                        key={value}
+                                        value={searchValue}
+                                        onSelect={() => {
+                                          setForm({ ...form, countryCode: value });
+                                          setCountryOpen(false);
+                                        }}
+                                        className="font-mono text-sm"
+                                      >
+                                        <span className="mr-2">{c.flag}</span>
+                                        <span className="text-muted-foreground mr-2 w-7">{c.code}</span>
+                                        <span className="mr-2 w-12">{c.dial}</span>
+                                        <span className="text-muted-foreground truncate">{c.name}</span>
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <Input
+                          type="tel"
+                          inputMode="tel"
+                          value={form.phone}
+                          onChange={(e) =>
+                            setForm({ ...form, phone: e.target.value.replace(/[^\d\s\-().]/g, "") })
+                          }
+                          placeholder="555 0100"
+                          maxLength={20}
+                          className="bg-input border-border h-11 flex-1"
+                        />
+                      </div>
                     </Field>
                     <Field label="Organization size" hint="optional">
                       <Input
@@ -528,7 +640,14 @@ const handleSubmit = async (e: React.FormEvent) => {
                       disabled={submitting}
                       className="group flex-1 sm:flex-initial"
                     >
-                      {submitting ? "Submitting…" : "Request Early Access & Provide Feedback"}
+                      {submitting ? (
+                        "Submitting…"
+                      ) : (
+                        <>
+                          <span className="sm:hidden">Send Feedback</span>
+                          <span className="hidden sm:inline">Share Feedback & Register Interest</span>
+                        </>
+                      )}
                       <Send className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </Button>
                     <p className="text-xs text-muted-foreground">

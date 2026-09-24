@@ -75,7 +75,7 @@ async function detectRegion(): Promise<string> {
     sessionStorage.setItem(REGION_KEY, loc);
     return loc;
   } catch {
-    // On failure/timeout, treat as consent-required (safe default).
+    // On failure/timeout the region is unknown ("XX") — not a consent region.
     sessionStorage.setItem(REGION_KEY, "XX");
     return "XX";
   }

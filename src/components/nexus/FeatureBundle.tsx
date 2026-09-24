@@ -311,7 +311,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   className="mt-6 mx-auto h-0.5 bg-accent rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: "100%" }}
-                  transition={{ duration: 1.05, ease: "easeInOut" }}
+                  transition={{ duration: 0.58, ease: "easeInOut" }}
                   style={{ maxWidth: 280 }}
                 />
               </div>

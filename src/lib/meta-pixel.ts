@@ -1,8 +1,8 @@
 // Meta Pixel — consent-aware loader.
 // The pixel is only initialized when tracking is permitted:
 // - Visitors outside consent regions: init + PageView immediately.
-// - Visitors in consent regions (EEA, UK, CH) or unknown regions: nothing is
-//   initialized until they accept in the banner. Declining keeps it fully off.
+// - Visitors in consent regions (EEA, UK, CH): nothing is initialized until they
+//   accept in the banner. Declining keeps it fully off.
 // The choice is persisted in localStorage and can be changed anytime via the
 // footer's "Cookie settings" link.
 
@@ -75,7 +75,7 @@ async function detectRegion(): Promise<string> {
     sessionStorage.setItem(REGION_KEY, loc);
     return loc;
   } catch {
-    // On failure/timeout, treat as consent-required (safe default).
+    // On failure/timeout the region is unknown ("XX") — not a consent region.
     sessionStorage.setItem(REGION_KEY, "XX");
     return "XX";
   }
@@ -95,8 +95,9 @@ function persistChoice(choice: "accepted" | "declined") {
 /** Call once at app start. Resolves region + stored consent, fires PageView when allowed. */
 export async function initMetaPixel() {
   const region = await detectRegion();
-  // Unknown (XX) or Tor (T1) regions are treated as consent-required.
-  const needsConsent = CONSENT_REGIONS.has(region) || region === "XX" || region === "T1";
+  // Only EEA / UK / CH visitors need explicit opt-in. When the region cannot be
+  // determined (e.g. no /cdn-cgi/trace on the host), track normally.
+  const needsConsent = CONSENT_REGIONS.has(region);
 
   if (!needsConsent) {
     activatePixel();

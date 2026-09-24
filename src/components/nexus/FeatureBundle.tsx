@@ -229,20 +229,25 @@ const handleSubmit = async (e: React.FormEvent) => {
   setSubmitting(true);
 
   try {
-      const dial = form.countryCode.split("|")[1] ?? "";
-      const fullPhone = form.phone.trim() ? `${dial} ${form.phone.trim()}` : "";
-    await fetch(SHEET_WEBHOOK_URL, {
+    const dial = form.countryCode.split("|")[1] ?? "";
+    const fullPhone = form.phone.trim() ? `${dial} ${form.phone.trim()}` : "";
+
+    // Fire-and-forget: Apps Script can take 20–30s to finish (sheet write + email).
+    // We cannot read the response in no-cors mode anyway, so don't block the UI on it.
+    void fetch(SHEET_WEBHOOK_URL, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: form.name,
         email: form.email,
-        phone: form.phone,
+        phone: fullPhone,
         useCase: form.useCase,
         selectedFeatures: [...selected].join(", "),
         integrations: [...selectedIntegrations, ...customIntegrations].join(", "),
       }),
+    }).catch((err) => {
+      console.error("Sheet webhook failed:", err);
     });
   } catch (err) {
     toast.error("Something went wrong. Please try again.");
@@ -250,13 +255,13 @@ const handleSubmit = async (e: React.FormEvent) => {
     return;
   }
 
-  // Keep the animation timing exactly as before
+  // Short, deliberate transition — then straight to the success state.
   setTimeout(() => {
     setSubmitting(false);
     setSubmitted(true);
     trackLead();
     toast.success("Feedback received — we'll be in touch shortly.");
-  }, 1100);
+  }, 600);
 };
 
   return (
@@ -306,7 +311,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   className="mt-6 mx-auto h-0.5 bg-accent rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: "100%" }}
-                  transition={{ duration: 1.05, ease: "easeInOut" }}
+                  transition={{ duration: 0.58, ease: "easeInOut" }}
                   style={{ maxWidth: 280 }}
                 />
               </div>

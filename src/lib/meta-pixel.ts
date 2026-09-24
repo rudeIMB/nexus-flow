@@ -1,8 +1,8 @@
 // Meta Pixel — consent-aware loader.
 // The pixel is only initialized when tracking is permitted:
 // - Visitors outside consent regions: init + PageView immediately.
-// - Visitors in consent regions (EEA, UK, CH) or unknown regions: nothing is
-//   initialized until they accept in the banner. Declining keeps it fully off.
+// - Visitors in consent regions (EEA, UK, CH): nothing is initialized until they
+//   accept in the banner. Declining keeps it fully off.
 // The choice is persisted in localStorage and can be changed anytime via the
 // footer's "Cookie settings" link.
 

@@ -95,8 +95,9 @@ function persistChoice(choice: "accepted" | "declined") {
 /** Call once at app start. Resolves region + stored consent, fires PageView when allowed. */
 export async function initMetaPixel() {
   const region = await detectRegion();
-  // Unknown (XX) or Tor (T1) regions are treated as consent-required.
-  const needsConsent = CONSENT_REGIONS.has(region) || region === "XX" || region === "T1";
+  // Only EEA / UK / CH visitors need explicit opt-in. When the region cannot be
+  // determined (e.g. no /cdn-cgi/trace on the host), track normally.
+  const needsConsent = CONSENT_REGIONS.has(region);
 
   if (!needsConsent) {
     activatePixel();
